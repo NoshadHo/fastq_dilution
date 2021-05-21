@@ -26,11 +26,11 @@ function dilute_fastq {
     temp_fn=$9
     echo "[1] PARSING END"
 
-    ## make a folder and unzip the files
+    # make a folder and unzip the files
     echo "[2] UNZIPING START"
     start=`date +%s`
 
-    mkdir "temp_fn/fastqDilutiontmp"
+    mkdir "$temp_fn/tmp"
 
     zcat $t_fastq1 > "$temp_fn/tmp/$id.t.1.fq"
     fqt1="$temp_fn/tmp/$id.t.1.fq"
@@ -68,6 +68,7 @@ function dilute_fastq {
     echo "[5] MAIN PROCESS START"
     for dil_perc in $dilutions
     do
+        echo "[5.0] FOR  DILUTION OF: $dil_perc"
         # determine read numbers
         t_read_num=$(echo "$depth_target*$dil_perc"/1|bc)
         n_read_num=$(echo "$depth_target-$t_read_num"/1|bc)
@@ -76,19 +77,9 @@ function dilute_fastq {
         # sample reads
         echo "[5.2] SAMPLING START"
         start_all=`date +%s`
-        start=`date +%s`
         $seqtk sample -s100 $fqt1 $t_read_num > "$temp_fn/tmp/$id.t.1.tmp.$dil_perc.fq"
-        end=`date +%s`
-        echo $((end-start))
-        start=`date +%s`
         $seqtk sample -s100 $fqt2 $t_read_num > "$temp_fn/tmp/$id.t.2.tmp.$dil_perc.fq"
-        end=`date +%s`
-        echo $((end-start))
-        start=`date +%s`
         $seqtk sample -s100 $fqn1 $n_read_num > "$temp_fn/tmp/$id.n.1.tmp.$dil_perc.fq"
-        end=`date +%s`
-        echo $((end-start))
-        start=`date +%s`
         $seqtk sample -s100 $fqn2 $n_read_num > "$temp_fn/tmp/$id.n.2.tmp.$dil_perc.fq"
         end_all=`date +%s`
         runtime=$((end_all-start_all))
@@ -96,8 +87,8 @@ function dilute_fastq {
 
         # write into one file
         echo "[5.3] WRITING START"
-        cat "$temp_fn/tmp/$id.t.1.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.1.tmp.$dil_perc.fq" > "$out_fn/$id.n.2.$dil_perc.fq"
-        cat "$temp_fn/tmp/$id.t.2.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.2.tmp.$dil_perc.fq" > "$out_fn/$id.n.2.$dil_perc.fq"
+        cat "$temp_fn/tmp/$id.t.1.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.1.tmp.$dil_perc.fq" > "$out_fn/$id.t.1.$dil_perc.fq"
+        cat "$temp_fn/tmp/$id.t.2.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.2.tmp.$dil_perc.fq" > "$out_fn/$id.t.2.$dil_perc.fq"
         echo "[5.3] WRITING END"
     done
     echo "[5] MAIN PROCESS END"
@@ -114,7 +105,7 @@ dilutions="0.1;0.5;0.9"
 depth_perc="0.9"
 temp_fn="/mctp/users/noshadh/data/cin/grants/cin/test/tmp"
 
-dilute_fastq $id $t_fastq1 $t_fastq2 $n_fastq1 $n_fastq2 $out_fn $diilutions $depth_perc $temp_fn
+dilute_fastq $id $t_fastq1 $t_fastq2 $n_fastq1 $n_fastq2 $out_fn $dilutions $depth_perc $temp_fn
 
 # ## zcat
 # ## seqtk
@@ -156,3 +147,4 @@ dilute_fastq $id $t_fastq1 $t_fastq2 $n_fastq1 $n_fastq2 $out_fn $diilutions $de
 
 # #yourfile.fastq.gz
 #  echo $(zcat yourfile.fastq.gz|wc -l)/4|bc
+
