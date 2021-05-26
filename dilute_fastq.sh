@@ -11,7 +11,7 @@ function dilute_fastq {
 #   $6 is write location
 #   $7 dilution percent (x% means x part tumor and 1-x part normal) (should be in the form of X1;X2;X3;...;Xn where Xi is the ith dilution)
 #   $8 depth percent (what percentage of minimum tumor/normal as total depth)
-#   $9 temp location
+#   $9 temp folder location
 
     ## parse the arguments
     echo "[1] PARSING START"
@@ -66,6 +66,7 @@ function dilute_fastq {
 
     ## decide number of reads from normal and tumor  | sample | write
     echo "[5] MAIN PROCESS START"
+    mkdir "$out_fn/$id"
     for dil_perc in $dilutions
     do
         echo "[5.0] FOR  DILUTION OF: $dil_perc"
@@ -87,25 +88,34 @@ function dilute_fastq {
 
         # write into one file
         echo "[5.3] WRITING START"
-        cat "$temp_fn/tmp/$id.t.1.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.1.tmp.$dil_perc.fq" > "$out_fn/$id.t.1.$dil_perc.fq"
-        cat "$temp_fn/tmp/$id.t.2.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.2.tmp.$dil_perc.fq" > "$out_fn/$id.t.2.$dil_perc.fq"
+        cat "$temp_fn/tmp/$id.t.1.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.1.tmp.$dil_perc.fq" > "$out_fn/$id/$id.t.1.$dil_perc.fq"
+        cat "$temp_fn/tmp/$id.t.2.tmp.$dil_perc.fq" "$temp_fn/tmp/$id.n.2.tmp.$dil_perc.fq" > "$out_fn/$id/$id.t.2.$dil_perc.fq"
         echo "[5.3] WRITING END"
     done
     echo "[5] MAIN PROCESS END"
 }
 
+    # echo $id
+    # echo $t_fastq1
+    # echo $t_fastq2
+    # echo $n_fastq1
+    # echo $n_fastq2
+    # echo $out_fn
+    # echo $dilutions
+    # echo $depth_perc
+    # echo $temp_fn
 
-id="testingFIRST"
-t_fastq1="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28322_HH7THBCX3_0_1.fq.gz"
-t_fastq2="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28322_HH7THBCX3_0_2.fq.gz"
-n_fastq1="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28323_HH7THBCX3_0_1.fq.gz"
-n_fastq2="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28323_HH7THBCX3_0_2.fq.gz"
-out_fn="/mctp/users/noshadh/data/cin/grants/cin/test/tmp"
-dilutions="0.1;0.5;0.9"
-depth_perc="0.9"
-temp_fn="/mctp/users/noshadh/data/cin/grants/cin/test/tmp"
+# id="testingFIRST"
+# t_fastq1="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28322_HH7THBCX3_0_1.fq.gz"
+# t_fastq2="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28322_HH7THBCX3_0_2.fq.gz"
+# n_fastq1="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28323_HH7THBCX3_0_1.fq.gz"
+# n_fastq2="/mctp/users/noshadh/data/cin/grants/cin/test/mctp_SI_28323_HH7THBCX3_0_2.fq.gz"
+# out_fn="/mctp/users/noshadh/data/cin/grants/cin/test/tmp"
+# dilutions="0.1;0.5;0.9"
+# depth_perc="0.9"
+# temp_fn="/mctp/users/noshadh/data/cin/grants/cin/test/tmp"
 
-dilute_fastq $id $t_fastq1 $t_fastq2 $n_fastq1 $n_fastq2 $out_fn $dilutions $depth_perc $temp_fn
+# dilute_fastq $id $t_fastq1 $t_fastq2 $n_fastq1 $n_fastq2 $out_fn $dilutions $depth_perc $temp_fn
 
 # ## zcat
 # ## seqtk
